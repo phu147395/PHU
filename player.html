@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHU.Net - Xem Phim</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .player-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+        }
+
+        .video-wrapper video,
+        .video-wrapper iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .movie-details {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .movie-details h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .movie-details .meta {
+            display: flex;
+            gap: 1.5rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .back-link:hover {
+            color: #3B9EFF;
+        }
+
+        .no-video {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            flex-direction: column;
+            gap: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i data-lucide="film" class="logo-icon"></i>
+                <span>PHU<span class="highlight">.Net</span></span>
+            </div>
+            <div class="header-actions">
+                <a href="index.html" class="btn-primary">Quay lại Trang Chủ</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="player-container">
+        <a class="back-link" onclick="history.back()">
+            <i data-lucide="arrow-left"></i> Quay lại
+        </a>
+
+        <div class="video-wrapper" id="videoPlayer">
+            <div class="no-video">
+                <i data-lucide="loader" style="width:48px;height:48px;"></i>
+                <p>Đang tải video...</p>
+            </div>
+        </div>
+
+        <div class="movie-details" id="movieDetails">
+            <h1 id="movieTitle">Đang tải...</h1>
+            <div class="meta">
+                <span class="meta-item" id="movieCountry"><i data-lucide="map-pin"></i> ...</span>
+                <span class="meta-item" id="movieCategory"><i data-lucide="tag"></i> ...</span>
+                <span class="meta-item" id="movieEpisode"><i data-lucide="tv"></i> ...</span>
+            </div>
+            <p id="movieSubtitle" style="color:var(--text-muted);"></p>
+        </div>
+    </main>
+
+    <script>
+        lucide.createIcons();
+
+        const API_BASE = 'https://localhost:7021/api';
+        const params = new URLSearchParams(window.location.search);
+        const movieId = params.get('id');
+
+        if (movieId) {
+            fetch(`${API_BASE}/movies/${movieId}`)
+                .then(res => res.json())
+                .then(movie => {
+                    // Title & details
+                    document.getElementById('movieTitle').innerText = movie.title || 'Không tên';
+                    document.getElementById('movieSubtitle').innerText = movie.subtitle || '';
+                    document.getElementById('movieCountry').innerHTML = `<i data-lucide="map-pin"></i> ${movie.country ? movie.country.name : 'N/A'}`;
+                    document.getElementById('movieCategory').innerHTML = `<i data-lucide="tag"></i> ${movie.category ? movie.category.name : 'N/A'}`;
+                    document.getElementById('movieEpisode').innerHTML = `<i data-lucide="tv"></i> Tập ${movie.currentEpisode || '?'}/${movie.totalEpisodes || '?'}`;
+                    document.title = `PHU.Net - ${movie.title}`;
+                    lucide.createIcons();
+
+                    // Logic phát video
+                    const wrapper = document.getElementById('videoPlayer');
+                    window.playVideoUrl = function (vUrl, epName = '') {
+                        if (!vUrl) {
+                            wrapper.innerHTML = `<div class="no-video"><i data-lucide="video-off" style="width:48px;height:48px;"></i><p>Tập phim chưa có link video.</p></div>`;
+                            lucide.createIcons();
+                            return;
+                        }
+
+                        if (epName) document.getElementById('movieEpisode').innerHTML = `<i data-lucide="tv"></i> Đang phát: ${epName}`;
+
+                        if (vUrl.includes('youtube.com') || vUrl.includes('youtu.be')) {
+                            let vid = '';
+                            if (vUrl.includes('watch?v=')) vid = new URL(vUrl).searchParams.get('v');
+                            else if (vUrl.includes('youtu.be/')) vid = vUrl.split('youtu.be/')[1]?.split('?')[0];
+                            else if (vUrl.includes('/embed/')) vid = vUrl.split('/embed/')[1]?.split('?')[0];
+
+                            const embedUrl = `https://www.youtube.com/embed/${vid}?autoplay=1&rel=0`;
+                            const youtubeDirectUrl = `https://www.youtube.com/watch?v=${vid}`;
+
+                            wrapper.innerHTML = `
+                                <iframe src="${embedUrl}" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+                                <div style="position:absolute;bottom:10px;left:10px;z-index:10;">
+                                    <a href="${youtubeDirectUrl}" target="_blank" 
+                                       style="background:var(--accent-color);color:white;padding:8px 16px;border-radius:6px;
+                                              font-weight:600;font-size:0.85rem;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
+                                        ▶ Xem trên YouTube (nếu bị chặn embed)
+                                    </a>
+                                </div>`;
+                        } else if (vUrl.includes('drive.google.com')) {
+                            let embedUrl = vUrl;
+                            if (vUrl.includes('/file/d/')) {
+                                const fileId = vUrl.split('/file/d/')[1]?.split('/')[0];
+                                embedUrl = `https://drive.google.com/file/d/${fileId}/preview`;
+                            }
+                            wrapper.innerHTML = `<iframe src="${embedUrl}" allowfullscreen allow="autoplay"></iframe>`;
+                        } else if (vUrl.includes('iframe') || vUrl.includes('embed')) {
+                            if (vUrl.trim().startsWith('<iframe')) {
+                                wrapper.innerHTML = vUrl;
+                                const iframe = wrapper.querySelector('iframe');
+                                if (iframe) { iframe.style.width = '100%'; iframe.style.height = '100%'; }
+                            } else {
+                                wrapper.innerHTML = `<iframe src="${vUrl}" style="width:100%;height:100%;border:none;" allowfullscreen allow="autoplay"></iframe>`;
+                            }
+                        } else if (vUrl.endsWith('.mp4') || vUrl.endsWith('.webm') || vUrl.includes('/uploads/videos/')) {
+                            wrapper.innerHTML = `<video controls autoplay style="width:100%;height:100%;"><source src="${vUrl}" type="video/mp4">Trình duyệt không hỗ trợ video này.</video>`;
+                        } else {
+                            wrapper.innerHTML = `<iframe src="${vUrl}" style="width:100%;height:100%;border:none;" allowfullscreen></iframe>`;
+                        }
+                    };
+
+                    // Khung Hiển thị danh sách tập
+                    const detailsDiv = document.getElementById('movieDetails');
+
+                    const epsContainer = document.createElement('div');
+                    epsContainer.style = "background: #0f172a; padding: 1rem; margin-top: 1.5rem; border-radius: 8px; display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap;";
+
+                    const epsLabel = document.createElement('span');
+                    epsLabel.innerText = "VietSub:";
+                    epsLabel.style = "color: #f59e0b; font-weight: 600; font-size: 1.1rem; margin-right: 0.5rem;";
+                    epsContainer.appendChild(epsLabel);
+
+                    // CSS cục bộ cho nút tập
+                    const style = document.createElement('style');
+                    style.innerHTML = `
+                        .ep-btn {
+                            background: #1e293b; color: white; border: none; padding: 8px 16px; 
+                            border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 1rem; transition: 0.2s;
+                        }
+                        .ep-btn:hover { background: #334155; }
+                        .ep-btn.active { background: #3b82f6; }
+                    `;
+                    document.head.appendChild(style);
+
+                    // Tổng hợp toàn bộ tập (Gộp video gốc thành Tập 1 nếu có và mảng tập con)
+                    let allEpisodes = [];
+
+                    // Kiểm tra xem trong các Tập đã thêm có "Tập 1" chưa
+                    let hasEp1 = movie.episodes && movie.episodes.some(e => e.episodeName.toLowerCase().replace('tập', '').trim() === '1');
+
+                    if (movie.videoUrl && !hasEp1) {
+                        // Mang video gốc từ bảng Phim vào làm Tập 1
+                        allEpisodes.push({
+                            episodeName: "1",
+                            videoUrl: movie.videoUrl
+                        });
+                    }
+
+                    if (movie.episodes && movie.episodes.length > 0) {
+                        movie.episodes.forEach(ep => allEpisodes.push(ep));
+                    }
+
+                    // Nếu có danh sách tập từ DB hoặc ghép thành công
+                    if (allEpisodes.length > 0) {
+                        allEpisodes.forEach((ep, index) => {
+                            const btn = document.createElement('button');
+                            btn.className = 'ep-btn';
+                            // Chỉ lấy số tập nếu tên tập là "Tập 2" -> "2"
+                            let shortName = ep.episodeName.toLowerCase().replace('tập', '').trim();
+                            if (!shortName) shortName = (index + 1).toString();
+
+                            btn.innerText = shortName;
+
+                            btn.onclick = () => {
+                                document.querySelectorAll('.ep-btn').forEach(b => b.classList.remove('active'));
+                                btn.classList.add('active');
+                                window.playVideoUrl(ep.videoUrl, `Tập ${shortName}`);
+                            };
+                            epsContainer.appendChild(btn);
+                        });
+                        detailsDiv.appendChild(epsContainer);
+
+                        // Phát tập mà người dùng vừa click (hoặc tập đầu tiên)
+                        const firstBtn = epsContainer.querySelector('.ep-btn');
+                        if (firstBtn) firstBtn.classList.add('active');
+                        window.playVideoUrl(allEpisodes[0].videoUrl, `Tập ${allEpisodes[0].episodeName.replace('tập', '').trim()}`);
+                    } else {
+                        // Lỡ như không có videoUrl và không có Episodes (thực tế rất hiếm vì luôn buộc có link)
+                        window.playVideoUrl(movie.videoUrl);
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('videoPlayer').innerHTML = `<div class="no-video"><p style="color:#ef4444;">Lỗi tải phim. Server có thể đang tắt.</p></div>`;
+                    console.error(err);
+                });
+        } else {
+            document.getElementById('videoPlayer').innerHTML = `<div class="no-video"><p>Không tìm thấy ID phim trong URL.</p></div>`;
+        }
+    </script>
+</body>
+
+</html>

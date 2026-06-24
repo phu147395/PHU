@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHU.Net - Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 6px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: white;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .upload-panels {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+        }
+
+        .panel {
+            padding: 1.5rem;
+            background: var(--bg-main);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        h3 {
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        .btn-submit {
+            width: 100%;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span>PHU<span class="highlight">.Net</span> Admin Panel</span>
+            </div>
+            <div class="header-actions">
+                <a href="index.html" class="btn-secondary">Quay lại trang chủ</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="admin-container">
+        <div class="admin-header">
+            <h2>Quản Lý Cơ Sở Dữ Liệu Phim</h2>
+        </div>
+
+        <div class="upload-panels">
+            <!-- Left Column: Add Category & Country -->
+            <div style="display: flex; flex-direction: column; gap: 2rem;">
+                <div class="panel">
+                    <h3>Thêm Thể Loại Mới</h3>
+                    <form id="categoryForm">
+                        <div class="form-group">
+                            <label>Tên Thể Loại (Category)</label>
+                            <input type="text" id="catName" required placeholder="VD: Hành Động">
+                        </div>
+                        <button type="submit" class="btn-primary btn-submit">Thêm Thể Loại</button>
+                    </form>
+                </div>
+
+                <div class="panel">
+                    <h3>Thêm Quốc Gia Mới</h3>
+                    <form id="countryForm">
+                        <div class="form-group">
+                            <label>Trực Thuộc (Country)</label>
+                            <input type="text" id="countryName" required placeholder="VD: Hàn Quốc">
+                        </div>
+                        <button type="submit" class="btn-primary btn-submit">Thêm Quốc Gia</button>
+                    </form>
+                </div>
+
+                <!-- Add Episode Panel -->
+                <div class="panel">
+                    <h3>Thêm Tập Cho Phim Đã Có</h3>
+                    <form id="episodeForm">
+                        <div class="form-group">
+                            <label>Chọn Phim</label>
+                            <select id="eMovie" required>
+                                <option value="">-- Tải dữ liệu... --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Tên Tập (VD: Tập 2)</label>
+                            <input type="text" id="eName" required placeholder="Tập 2">
+                        </div>
+                        <div class="form-group">
+                            <label>URL Video Hoặc Tải Video (.mp4)</label>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <input type="text" id="eVideoUrl" placeholder="https://..." style="flex:1;">
+                                <input type="file" id="eVideoFile" accept="video/mp4,video/webm"
+                                    style="width: auto; background: var(--bg-secondary);">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-primary e-submit" style="width:100%; margin-top:1rem;">Tải Lên
+                            Tập Mới</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Right Column: Add Movie -->
+            <div class="panel">
+                <h3>Thêm Phim Mới</h3>
+                <form id="movieForm">
+                    <div class="form-group">
+                        <label>Tên Phim</label>
+                        <input type="text" id="mTitle" required placeholder="Tên phim chính">
+                    </div>
+                    <div class="form-group">
+                        <label>Tên Phụ (Subtitle)</label>
+                        <input type="text" id="mSubtitle" placeholder="Tên tiếng Anh hoặc dịch">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Tập Hiện Tại</label>
+                            <input type="text" id="mCurrent" required placeholder="VD: Tập 10">
+                        </div>
+                        <div class="form-group">
+                            <label>Tổng Số Tập</label>
+                            <input type="text" id="mTotal" required placeholder="VD: 40">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>URL Hình Ảnh Hoặc Tải Ảnh Lên</label>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <input type="text" id="mImage" placeholder="http://..." style="flex:1;">
+                            <input type="file" id="mImageFile" accept="image/*"
+                                style="width: auto; background: var(--bg-secondary);">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>URL Video Hoặc Tải Video (.mp4) Lên Web</label>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <input type="text" id="mVideo" placeholder="https://youtube... hoặc link web"
+                                style="flex:1;">
+                            <input type="file" id="mVideoFile" accept="video/mp4,video/webm"
+                                style="width: auto; background: var(--bg-secondary);">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Chọn Thể Loại</label>
+                            <select id="mCategory" required>
+                                <option value="">-- Tải dữ liệu... --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Chọn Quốc Gia</label>
+                            <select id="mCountry" required>
+                                <option value="">-- Tải dữ liệu... --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="mFeatured"> Phim Nổi Bật (Hiện lên cột bên phải)
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn-primary btn-submit">Cập Nhật Phim Lên Server</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="panel" style="margin-top: 2rem;">
+            <h3>Danh Sách Phim & Cập Nhật Tập</h3>
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; margin-top: 1rem; color: white;">
+                    <thead>
+                        <tr
+                            style="background: var(--bg-tertiary); border-bottom: 2px solid var(--border-color); text-align: left;">
+                            <th style="padding: 1rem;">ID</th>
+                            <th style="padding: 1rem;">Tên Phim</th>
+                            <th style="padding: 1rem;">Tập Hiện Tại</th>
+                            <th style="padding: 1rem;">Tổng Tập</th>
+                            <th style="padding: 1rem;">Hành Động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="movieTableBody">
+                        <tr>
+                            <td colspan="5" style="padding: 1rem; text-align: center;">Đang tải dữ liệu...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script src="admin.js?v=2"></script>
+</body>
+
+</html>

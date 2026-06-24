@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHU.Net - Xem Phim Hay</title>
+    <!-- Modern font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Header Section -->
+    <header class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i data-lucide="film" class="logo-icon"></i>
+                <span>PHU<span class="highlight">.Net</span></span>
+            </div>
+
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="Nhập tên phim cần tìm...">
+                <button class="search-btn"><i data-lucide="search"></i> Tìm kiếm</button>
+            </div>
+
+            <div class="header-actions">
+                <button class="btn-primary" onclick="window.location.href='admin.html'">Trang Quản Trị (Admin)</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Navigation -->
+    <nav class="main-nav">
+        <ul>
+            <li class="active"><a href="#">PHIM MỚI</a></li>
+            <li><a href="#">TRUNG QUỐC</a></li>
+            <li><a href="#">HÀN QUỐC</a></li>
+            <li><a href="#">THÁI LAN</a></li>
+            <li><a href="#">HOẠT HÌNH</a></li>
+            <li><a href="#">TOP PHIM TIKTOK</a></li>
+        </ul>
+    </nav>
+    <div class="sub-nav">
+        <div class="dropdown">
+            <button class="btn-secondary" id="categoryToggle" onclick="toggleCategoryMenu()"><i data-lucide="menu"></i>
+                THỂ LOẠI</button>
+            <div class="dropdown-content" id="categoryMenu">
+                <a href="#">Đang tải...</a>
+            </div>
+        </div>
+        <button class="btn-secondary" onclick="filterByCategory(null, '')" style="margin-left: 1rem;"><i
+                data-lucide="list"></i> TẤT CẢ DANH MỤC</button>
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="container">
+
+        <!-- Left Column: Movie Grids -->
+        <div class="main-content">
+            <section class="movie-section">
+                <div class="section-header">
+                    <h2>PHIM MỚI CẬP NHẬT <i data-lucide="chevron-down"></i></h2>
+                    <a href="#" class="view-more">XEM THÊM <i data-lucide="chevrons-right"></i></a>
+                </div>
+
+                <div class="movie-grid">
+                    <!-- Phim sẽ được tải qua API từ C# Backend và chèn vào đây -->
+                    <p style="color:var(--text-muted);">Đang tải phim từ Server C#...</p>
+                </div>
+            </section>
+        </div>
+
+        <!-- Right Column: Sidebar -->
+        <aside class="sidebar">
+            <div class="featured-banner">
+                <img src="" alt="Banner Phim Nổi Bật"
+                    onerror="this.src='https://via.placeholder.com/350x250?text=PHU.Net+Movies'"
+                    style="width:100%; height: 250px; object-fit: cover; border-radius: 12px;">
+                <div class="featured-info">
+                    <h3>...</h3>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-header">
+                    <h3><i data-lucide="chevron-down"></i> PHIM MỚI NỔI BẬT</h3>
+                </div>
+
+                <div class="sidebar-list">
+                    <!-- Danh sách phim nổi bật sẽ được tải từ Server -->
+                    <p style="padding:1rem;color:var(--text-muted);">Đang tải dữ liệu...</p>
+                </div>
+            </div>
+        </aside>
+
+    </main>
+
+    <script src="script.js?v=8"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>
